@@ -70,7 +70,8 @@ const getChat = async (roomid) => {
 }
 //done
 const ChatFriendlist = async (id, pageno, pagesize) => {
-   let pageNumber = pageno;
+  let totalrecords = 0; 
+  let pageNumber = pageno;
    let pageCount = pagesize;
   let friendArr = [];
    let end = (pageNumber * pageCount) ;
@@ -90,18 +91,21 @@ const ChatFriendlist = async (id, pageno, pagesize) => {
             });
           }
           
- 
- countuser = {
-  page: parseInt(pageNumber),
-  pages: Math.ceil(friendArr.length / pageCount),
-  totalRecords: friendArr.length,
-};
-let FriendListArr = {
-  userlist: friendArr,
-  countuserlist: countuser,
-}
-console.log("object",FriendListArr);
- return { FriendListArr };
+          let TotalUserlist = await db.sequelize.query(`select COUNT(Chats.Friendsid) as TotalRecords from Chats INNER JOIN friends on friends.id = Chats.Friendsid INNER JOIN users sender ON Chats.senderId = sender.id INNER JOIN users receiver ON Chats.receiverId = receiver.id LEFT JOIN imagedata senderimage ON sender.id = senderimage.userId LEFT JOIN imagedata receiverimage ON receiver.id = receiverimage.userId WHERE Chats.id IN ( SELECT MAX(Chats.id) FROM Chats GROUP BY Chats.Friendsid ) AND (Chats.senderId = ${id} OR Chats.receiverId = ${id}) AND friends.isPending = 0 AND friends.isFriend = 1 ORDER BY Chats.id DESC;`);
+          TotalUserlist[0].forEach((x) =>  {
+            totalrecords = x.TotalRecords;
+          });
+          countuser = {
+            page: parseInt(pageNumber),
+            pages: Math.ceil(totalrecords / pageCount),
+            totalRecords: totalrecords,
+          };
+          let FriendListArr = {
+            userlist: friendArr,
+            countuserlist: countuser,
+          }
+          console.log("object",FriendListArr);
+          return { FriendListArr };
  }
 //Done
  const UpdateReadMessages = (id) => {
@@ -111,10 +115,18 @@ console.log("object",FriendListArr);
 }
 
 
-const SearchFriends = async (id, name) => {
+const SearchFriends = async (id, name, pageno, pagesize) => {
   
- let searchfriend = [];
- let GetSearchChatUserlist = await db.sequelize.query(`SELECT friends.id, friends.senderId, sender.userName AS SenderName, friends.receiverId, receiver.userName AS ReceiverName FROM friends INNER JOIN users sender ON friends.senderId = sender.id INNER JOIN users receiver ON friends.receiverId = receiver.id WHERE friends.isPending = 0 AND friends.isFriend = 1 AND (friends.senderId = ${id} OR friends.receiverId = ${id}) AND (sender.userName LIKE '${name}%' OR receiver.userName LIKE '${name}%') GROUP BY friends.id;`);
+          let totalrecords = 0; 
+          let pageNumber = pageno;
+          let pageCount = pagesize;
+          let end = (pageNumber * pageCount) ;
+          let start = end - pageCount;
+
+        let searchfriend = [];
+        let GetSearchChatUserlist = await db.sequelize.query(`SELECT friends.id, friends.senderId, sender.userName AS SenderName, friends.receiverId, receiver.userName AS ReceiverName FROM friends INNER JOIN users sender ON friends.senderId = sender.id INNER JOIN users receiver ON friends.receiverId = receiver.id WHERE friends.isPending = 0 AND friends.isFriend = 1 AND (friends.senderId = ${id} OR friends.receiverId = ${id}) AND (sender.userName LIKE '${name}%' OR receiver.userName LIKE '${name}%') GROUP BY friends.id LIMIT ${start}, ${pageCount};`);
+
+
 
  
          if(GetSearchChatUserlist){
@@ -127,11 +139,25 @@ const SearchFriends = async (id, name) => {
              }
            });
          }
+
+         let countsearchuser = await db.sequelize.query(`SELECT COUNT(friends.id) as TotalRecords FROM friends INNER JOIN users sender ON friends.senderId = sender.id INNER JOIN users receiver ON friends.receiverId = receiver.id WHERE friends.isPending = 0 AND friends.isFriend = 1 AND (friends.senderId = ${id} OR friends.receiverId = ${id}) AND (sender.userName LIKE '${name}%' OR receiver.userName LIKE '${name}%') GROUP BY friends.id;`);
+         countsearchuser[0].forEach((x) =>  {
+          totalrecords = x.TotalRecords;
+        });
          
+         countuser = {
+          page: parseInt(pageNumber),
+          pages: Math.ceil(totalrecords / pageCount),
+          totalRecords: totalrecords,
+        };
+        let FriendsArr = {
+          searchuserlist: searchfriend,
+          countsearchuserlist: countuser,
+        }
 
-         console.log("searchuserdata", searchfriend);
+         console.log("searchuserdata", FriendsArr);
 
-return { searchfriend };
+return { FriendsArr };
 }
 
 

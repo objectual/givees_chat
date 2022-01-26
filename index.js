@@ -63,11 +63,11 @@ io.use(socketioJwt.authorize({
   });
   
 
-  socket.on('Searchuserlist', async (name ,callback) => {
+  socket.on('Searchuserlist', async (pageno , pagesize , name ,callback) => {
     console.log("Searchuser", name);
-    const { searchfriend } = await SearchFriends(socket.decoded_token.id, name);
+    const { FriendsArr } = await SearchFriends(socket.decoded_token.id, name, pageno, pagesize);
     
-    socket.emit("Searchusers", searchfriend);
+    socket.emit("Searchusers", FriendsArr);
      
       callback();
     });

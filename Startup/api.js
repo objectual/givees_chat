@@ -8,6 +8,6 @@ var app = express();
 
 
 
-app.use("/chat", require("../Router/chat.router"));
+
 
 module.exports = app;
