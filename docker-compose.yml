@@ -1,0 +1,32 @@
+version : '3'
+services:
+    nodeChatapp1:
+        image: giveesserverchat
+        restart: always
+        deploy:
+            resources:
+                limits:
+                    memory: 1G
+        environment:
+            - PORT=6666
+        container_name: nodeChatapp1
+    nodeChatapp2:
+        image: giveesserverchat
+        restart: always
+        deploy:
+            resources:
+                limits:
+                    memory: 1G
+        environment:
+            - PORT=7777
+        container_name: nodeChatapp2
+    nodeChatapp3:
+        image: giveesserverchat
+        restart: always
+        deploy:
+            resources:
+                limits:
+                    memory: 1G
+        environment:
+            - PORT=8888
+        container_name: nodeChatapp3
