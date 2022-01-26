@@ -19,7 +19,7 @@ const handle = require("./Middleware/error");
 const swaggerUi = require("swagger-ui-express"),
   swaggerDocument = require("./swagger.json");
 // const { default_settings } = require("./user_default_settings");
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 
 app.use(cors());
