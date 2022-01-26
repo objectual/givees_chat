@@ -54,7 +54,7 @@ io.use(socketioJwt.authorize({
  io.on('connection', async (socket) => {
   
   socket.on('userlist', async (pageno, pagesize ,callback) => {
-  console.log("new data",pageno, pagesize);
+  
   const { FriendListArr } = await ChatFriendlist(socket.decoded_token.id, pageno, pagesize);
   
   socket.emit("users", FriendListArr);
@@ -64,7 +64,7 @@ io.use(socketioJwt.authorize({
   
 
   socket.on('Searchuserlist', async (pageno , pagesize , name ,callback) => {
-    console.log("Searchuser", name);
+    
     const { FriendsArr } = await SearchFriends(socket.decoded_token.id, name, pageno, pagesize);
     
     socket.emit("Searchusers", FriendsArr);
@@ -74,14 +74,14 @@ io.use(socketioJwt.authorize({
   
    
   socket.on('join', async (data, callback) => {
-    console.log("receiverid",data);
+    
 
     
     const { error, user } = await addUser({ id: socket.decoded_token.id, data });
     
     
     if(error) return callback(error);
-    console.log("hgdshd",user.roomid);
+    
     socket.join(user.roomid);
 
     
@@ -102,7 +102,7 @@ io.use(socketioJwt.authorize({
   
 
   socket.on('sendMessage', async (roomid, message,callback) => {
-    console.log("eeeeeeeee",message, roomid);
+   
   const user = await getUser(socket.decoded_token.id, roomid);
   
   if(!user){
@@ -126,7 +126,7 @@ io.use(socketioJwt.authorize({
   
   socket.on('leave', async (roomid, callback) => {
     const user = LeaveRoom(socket.decoded_token.id,roomid);
-    console.log("disconnected", user);
+    
   callback();
   });
 
