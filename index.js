@@ -18,7 +18,7 @@ const { connect_cache } = require("./cache/redis.service");
 const handle = require("./Middleware/error");
 const swaggerUi = require("swagger-ui-express"),
   swaggerDocument = require("./swagger.json");
-const { default_settings } = require("./user_default_settings");
+// const { default_settings } = require("./user_default_settings");
 const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 
@@ -165,16 +165,16 @@ db.sequelize
             console.info(`✔️ (${process.env.NODE_ENV}) ENV Loaded`);
           }
           console.info(`⌚`, moment().format("DD-MM-YYYY hh:mm:ss a"));
-          default_settings()
-            .then(() => {
-              console.log(`✔️ Default Data Set`);
-            })
-            .catch((e) => {
-              if (e) {
-                console.error("❗️ Could not execute properly", e);
-              }
-              console.log(`✔️ Default Data Exists`);
-            });
+          // default_settings()
+          //   .then(() => {
+          //     console.log(`✔️ Default Data Set`);
+          //   })
+          //   .catch((e) => {
+          //     if (e) {
+          //       console.error("❗️ Could not execute properly", e);
+          //     }
+          //     console.log(`✔️ Default Data Exists`);
+          //   });
         });
       })
       .catch((err) => {

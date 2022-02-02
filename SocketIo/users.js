@@ -124,7 +124,7 @@ const SearchFriends = async (id, name, pageno, pagesize) => {
 
  
          if(GetSearchChatUserlist){
-          console.log("searchuserdata", GetSearchChatUserlist[0]);
+          
           GetSearchChatUserlist[0].forEach((res) =>  {
              if (res.senderId === id) {
               searchfriend.push({"Friendsid":res.id,"Userid":res.receiverId,"UserName":res.ReceiverName });
