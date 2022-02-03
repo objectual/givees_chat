@@ -50,6 +50,16 @@ const {
   SearchFriends,
 } = require("./SocketIo/users");
 
+const {
+  GetNotifications,
+  UpdateNotifications,
+  GetNewNotification,
+  countNotificationNumer,
+} = require("./SocketIo/notification");
+
+
+
+
 io.use(
   socketioJwt.authorize({
     secret: publicKEY,
@@ -57,6 +67,43 @@ io.use(
   })
 );
 io.on("connection", async (socket) => {
+
+  socket.on("NotificationCount", async ( callback) => {
+    const { countNotification } = await countNotificationNumer(
+      socket.decoded_token.id,
+    );
+
+    socket.emit("NotificationCount", countNotification);
+    
+    callback();
+  });
+  
+  
+  socket.on("Notificationlist", async (pageno, pagesize, callback) => {
+    const { NotificationArr } = await GetNotifications(
+      socket.decoded_token.id,
+      pageno,
+      pagesize
+    );
+
+    socket.emit("Notifications", NotificationArr);
+    //All NotificationCount Read
+    UpdateNotifications(socket.decoded_token.id);
+    callback();
+  });
+
+  socket.on("SendNotification", async (Notificationid, callback) => {
+    const { NewNotification } = await GetNewNotification(
+     
+    );
+
+    socket.emit("NewNotification", NewNotification);
+    
+    
+    callback();
+  });
+
+
   socket.on("userlist", async (pageno, pagesize, callback) => {
     const { FriendListArr } = await ChatFriendlist(
       socket.decoded_token.id,
