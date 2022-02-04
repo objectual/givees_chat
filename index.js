@@ -57,6 +57,11 @@ const {
   countNotificationNumer,
 } = require("./SocketIo/notification");
 
+const {
+  fcm,
+  GetFCMToken,
+} = require("./SocketIo/fcmnotifications");
+
 
 
 
@@ -183,6 +188,21 @@ io.on("connection", async (socket) => {
       message,
       Isread: read,
     });
+
+    if (!useravailable) {
+      const { messagepayload } = await GetFCMToken(user.data);
+       fcm.send(messagepayload, function(err, response){
+           if (err) {
+               console.log("Something has gone wrong!");
+               console.log("error: ", err);
+              
+           } else {
+               console.log("Successfully sent with response: ", response);
+               
+           }
+       });
+       
+     }
 
     callback();
   });

@@ -51,7 +51,7 @@ const GetNotifications = async (id, pageno, pagesize) => {
 const UpdateNotifications = (id) => {
   
   
-    db.sequelize.query(`UPDATE Notifications SET Notifications.IsCount = 1 WHERE Notifications.receiverId = ${id}`);
+    db.sequelize.query(`UPDATE Notifications SET Notifications.IsCount = 0 WHERE Notifications.receiverId = ${id}`);
   }
 
   const GetNewNotification = async (id) => {
