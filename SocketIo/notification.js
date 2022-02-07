@@ -2,12 +2,13 @@ const db = require("../Model/index");
 const _ = require("lodash");
 
 const countNotificationNumer = async (id) => {
-  let countNotification = await db.sequelize.query(`SELECT COUNT(Notifications.NotificationId) as NewNotificationCount FROM Notifications INNER JOIN users sender ON sender.id = Notifications.senderId INNER JOIN users receiver ON receiver.id = Notifications.receiverId INNER JOIN NotificationRoutes ON NotificationRoutes.RouteId = Notifications.RouteId left JOIN imagedata ON sender.id = imagedata.userId WHERE Notifications.receiverId = 4 && Notifications.IsAction = 1`);
+  let notifycount = 0;
+  let countNotification = await db.sequelize.query(`SELECT COUNT(Notifications.NotificationId) as NewNotificationCount FROM Notifications INNER JOIN users sender ON sender.id = Notifications.senderId INNER JOIN users receiver ON receiver.id = Notifications.receiverId INNER JOIN NotificationRoutes ON NotificationRoutes.RouteId = Notifications.RouteId left JOIN imagedata ON sender.id = imagedata.userId WHERE Notifications.receiverId = 4 && Notifications.IsCount = 1`);
    countNotification[0].forEach((x) =>  {
-    totalrecords = x.NewNotificationCount;
+    notifycount = x.NewNotificationCount;
   });
    
-  return { countNotification };
+  return { notifycount };
 }
 
 
@@ -18,7 +19,7 @@ const GetNotifications = async (id, pageno, pagesize) => {
     let pageCount = pagesize;
     let end = (pageNumber * pageCount) ;
     let start = end - pageCount;
-    console.log("sagsfa",start, pageCount );
+    
     
     let GetSearchChatUserlist = await db.sequelize.query(`SELECT  Notifications.*, sender.userName AS SenderName, imagedata.imageId, imagedata.imageUrl, receiver.userName AS ReceiverNAME, NotificationRoutes.Route  FROM Notifications INNER JOIN users sender ON sender.id = Notifications.senderId INNER JOIN users receiver ON receiver.id = Notifications.receiverId INNER JOIN NotificationRoutes ON NotificationRoutes.RouteId = Notifications.RouteId left JOIN imagedata ON sender.id = imagedata.userId WHERE Notifications.receiverId = 4 ORDER BY Notifications.NotificationId DESC LIMIT ${start}, ${pageCount};`);
 

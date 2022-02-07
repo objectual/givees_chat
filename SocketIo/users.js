@@ -66,14 +66,24 @@ const getChat = async (roomid) => {
 
 const ChatFriendlist = async (id, pageno, pagesize) => {
   let totalrecords = 0; 
+  let Isactive = 0;
   let pageNumber = pageno;
   let pageCount = pagesize;
   let friendArr = [];
   let end = (pageNumber * pageCount) ;
   let start = end - pageCount;
    
+  let ChatOption = await db.sequelize.query("SELECT AppSettings.IsActive FROM AppSettings WHERE AppSettings.Id = 1");
+  ChatOption[0].forEach((x) =>  {
+    Isactive = x.IsActive;
+  });
+  if(Isactive === 0)
+  {
+    return { error: ({error: "Chat Option Temporary Unavailable.", Statuscode: 503 }) };
+  }
+  
   let GetChatUserlist = await db.sequelize.query(`select Chats.Friendsid, Chats.senderId AS SenderId, Chats.receiverId AS ReceiverId, Chats.Message, Chats.IsReed, Chats.createdAt, sender.userName as Sendername, senderimage.imageId AS SenderImageId, senderimage.imageUrl AS SenderImageurl, receiver.userName AS receiverName, receiverimage.imageId AS ReceiverImageId, receiverimage.imageUrl AS ReceiverImageurl from Chats INNER JOIN friends on friends.id = Chats.Friendsid INNER JOIN users sender ON Chats.senderId = sender.id INNER JOIN users receiver ON Chats.receiverId = receiver.id LEFT JOIN imagedata senderimage ON sender.id = senderimage.userId LEFT JOIN imagedata receiverimage ON receiver.id = receiverimage.userId WHERE Chats.id IN ( SELECT MAX(Chats.id) FROM Chats GROUP BY Chats.Friendsid ) AND (Chats.senderId = ${id} OR Chats.receiverId = ${id}) AND friends.isPending = 0 AND friends.isFriend = 1 ORDER BY Chats.id DESC LIMIT ${start}, ${pageCount};`);
-
+ 
   
           if(GetChatUserlist){
             

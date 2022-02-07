@@ -74,11 +74,11 @@ io.use(
 io.on("connection", async (socket) => {
 
   socket.on("NotificationCount", async ( callback) => {
-    const { countNotification } = await countNotificationNumer(
+    const { notifycount } = await countNotificationNumer(
       socket.decoded_token.id,
     );
 
-    socket.emit("NotificationCount", countNotification);
+    socket.emit("CountNotification", notifycount);
     
     callback();
   });
@@ -110,11 +110,14 @@ io.on("connection", async (socket) => {
 
 
   socket.on("userlist", async (pageno, pagesize, callback) => {
-    const { FriendListArr } = await ChatFriendlist(
+    const { FriendListArr, error } = await ChatFriendlist(
       socket.decoded_token.id,
       pageno,
       pagesize
     );
+    if(error){
+      return callback(error);
+    }
 
     socket.emit("users", FriendListArr);
 
