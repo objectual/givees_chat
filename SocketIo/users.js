@@ -50,16 +50,20 @@ const getUser = (id, roomid) => users.find((user) => user.id === id && user.room
 const getUsersInRoom = (roomid) => users.filter((user) => user.roomid === roomid);
 
 
-const addChat = ({senderid,receiverid,roomid,message,Isread}) => {
+const addChat = async ({senderid,receiverid,roomid,message,Isread}) => {
+  let messageid;
   
-  
-   db.sequelize.query(`INSERT INTO Chats (Chats.Friendsid, Chats.senderId, Chats.receiverId, Chats.Message, Chats.MessageTypeid, Chats.IsReed ) VALUES (${roomid},${senderid},${receiverid},"${message}",${roomid},${Isread})`);
+  let res = await db.sequelize.query(`INSERT INTO Chats (Chats.Friendsid, Chats.senderId, Chats.receiverId, Chats.Message, Chats.MessageTypeid, Chats.IsReed ) VALUES (${roomid},${senderid},${receiverid},"${message}",${roomid},${Isread})`);
+  res[0].forEach((x) =>  {
+    messageid = x.id;
+    });
+    return { messageid };
 }
 
 const getChat = async (roomid) => {
   
   
- let history = await db.sequelize.query(`SELECT senderId AS SenderId , receiverId AS ReceiverId , Message, createdAt FROM Chats WHERE Chats.Friendsid = ${roomid} ORDER BY Chats.id DESC`);
+ let history = await db.sequelize.query(`SELECT id as Messageid, senderId AS SenderId , receiverId AS ReceiverId , Message, createdAt FROM Chats WHERE Chats.Friendsid = ${roomid} && Chats.SoftDelete = 0 ORDER BY Chats.id DESC`);
  
  return { history };
 }
@@ -119,6 +123,13 @@ const ChatFriendlist = async (id, pageno, pagesize) => {
   db.sequelize.query(`UPDATE Chats SET Chats.IsReed = 0 WHERE Chats.receiverId = ${id}`);
 }
 
+const UpdateDeleteMessages = (messageid) => {
+  
+  messageid.map((x, i, arr) => {
+  db.sequelize.query(`UPDATE Chats SET Chats.SoftDelete = 1 WHERE Chats.id = ${x}`);
+});
+}
+
 const SearchFriends = async (id, name, pageno, pagesize) => {
   
         let totalrecords = 0; 
@@ -163,5 +174,5 @@ const SearchFriends = async (id, name, pageno, pagesize) => {
 }
 
 
-module.exports = { addUser, removeUser, getUser, getUsersInRoom, addChat, getChat, ChatFriendlist, UpdateReadMessages, LeaveRoom, SearchFriends};
+module.exports = { addUser, removeUser, getUser, getUsersInRoom, addChat, getChat, ChatFriendlist, UpdateReadMessages, LeaveRoom, SearchFriends, UpdateDeleteMessages};
 

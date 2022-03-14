@@ -48,6 +48,7 @@ const {
   UpdateReadMessages,
   LeaveRoom,
   SearchFriends,
+  UpdateDeleteMessages,
 } = require("./SocketIo/users");
 
 const {
@@ -98,9 +99,7 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("SendNotification", async (Notificationid, callback) => {
-    const { NewNotification } = await GetNewNotification(
-     
-    );
+    const { NewNotification } = await GetNewNotification(Notificationid);
 
     socket.emit("NewNotification", NewNotification);
     
@@ -177,20 +176,23 @@ io.on("connection", async (socket) => {
       read = 1;
     }
     let time = new Date();
-    io.to(user.roomid).emit("message", {
-      SenderId: socket.decoded_token.id,
-      ReceiverId: user.data,
-      Message: message,
-      createdAt: time,
-    });
-
-    addChat({
+    const { messageid } = await addChat({
       senderid: socket.decoded_token.id,
       receiverid: user.data,
       roomid: user.roomid,
       message,
       Isread: read,
     });
+
+    io.to(user.roomid).emit("message", {
+      Messageid: messageid,
+      SenderId: socket.decoded_token.id,
+      ReceiverId: user.data,
+      Message: message,
+      createdAt: time,
+    });
+
+    
 
     if (!useravailable) {
       const { messagepayload } = await GetFCMToken(user.data);
@@ -207,6 +209,16 @@ io.on("connection", async (socket) => {
        
      }
 
+    callback();
+  });
+
+  socket.on("DeleteMessage", async ( messageid, callback) => {
+    console.log("eeeeeeeeeee",messageid)
+     UpdateDeleteMessages(
+      messageid
+    );
+
+    
     callback();
   });
 

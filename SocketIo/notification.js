@@ -55,14 +55,14 @@ const UpdateNotifications = (id) => {
     db.sequelize.query(`UPDATE Notifications SET Notifications.IsCount = 0 WHERE Notifications.receiverId = ${id}`);
   }
 
-  const GetNewNotification = async (id) => {
+const GetNewNotification = async (id) => {
   
    
     
     let NewNotification = await db.sequelize.query(`SELECT  Notifications.*, sender.userName AS SenderName, imagedata.imageId, imagedata.imageUrl, receiver.userName AS ReceiverNAME, NotificationRoutes.Route  FROM Notifications INNER JOIN users sender ON sender.id = Notifications.senderId INNER JOIN users receiver ON receiver.id = Notifications.receiverId INNER JOIN NotificationRoutes ON NotificationRoutes.RouteId = Notifications.RouteId left JOIN imagedata ON sender.id = imagedata.userId WHERE Notifications.NotificationId = ${id};`);
 
   return { NewNotification };
-} 
+ } 
 
 
 
