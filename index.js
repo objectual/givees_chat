@@ -73,7 +73,7 @@ io.use(
   })
 );
 io.on("connection", async (socket) => {
-
+console.log("Socke_Connection", socket.decoded_token.id);
   socket.on("NotificationCount", async ( callback) => {
     const { notifycount } = await countNotificationNumer(
       socket.decoded_token.id,
@@ -86,6 +86,7 @@ io.on("connection", async (socket) => {
   
   
   socket.on("Notificationlist", async (pageno, pagesize, callback) => {
+    console.log("Socket_NotificationHistory", socket.decoded_token.id);
     const { NotificationArr } = await GetNotifications(
       socket.decoded_token.id,
       pageno,
@@ -117,13 +118,14 @@ io.on("connection", async (socket) => {
     if(error){
       return callback(error);
     }
-
+    console.log("Socke_Userlist", socket.decoded_token.id);
     socket.emit("users", FriendListArr);
 
     callback();
   });
 
   socket.on("Searchuserlist", async (pageno, pagesize, name, callback) => {
+    console.log("Socke_Searchuser", name);
     const { FriendsArr } = await SearchFriends(
       socket.decoded_token.id,
       name,
@@ -137,6 +139,7 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("join", async (data, callback) => {
+    console.log("Socke_Joinroom", socket.decoded_token.id);
     const { error, user } = await addUser({
       id: socket.decoded_token.id,
       data,
@@ -164,6 +167,7 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("sendMessage", async (roomid, message, callback) => {
+    console.log("Socke_messagesend", socket.decoded_token.id);
     const user = await getUser(socket.decoded_token.id, roomid);
 
     if (!user) {
@@ -213,7 +217,7 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("DeleteMessage", async ( messageid, callback) => {
-    console.log("eeeeeeeeeee",messageid)
+    console.log("DeleteMessage",messageid)
      UpdateDeleteMessages(
       messageid
     );
@@ -223,12 +227,14 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("leave", async (roomid, callback) => {
+    console.log("Socke_leave", socket.decoded_token.id);
     const user = LeaveRoom(socket.decoded_token.id, roomid);
 
     callback();
   });
 
   socket.on("disconnect", () => {
+    console.log("Socke_dissconnect", socket.decoded_token.id);
     const user = removeUser(socket.decoded_token.id);
 
     // if(user) {
