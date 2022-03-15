@@ -73,7 +73,9 @@ io.use(
   })
 );
 io.on("connection", async (socket) => {
+  console.log('==============================Socke_Connection======================');
 console.log("Socke_Connection", socket.decoded_token.id);
+console.log('==============================Socke_Connection======================');
   socket.on("NotificationCount", async ( callback) => {
     const { notifycount } = await countNotificationNumer(
       socket.decoded_token.id,
@@ -86,7 +88,9 @@ console.log("Socke_Connection", socket.decoded_token.id);
   
   
   socket.on("Notificationlist", async (pageno, pagesize, callback) => {
+    console.log('==============================Socket_NotificationHistory======================');
     console.log("Socket_NotificationHistory", socket.decoded_token.id);
+    console.log('==============================Socket_NotificationHistory======================');
     const { NotificationArr } = await GetNotifications(
       socket.decoded_token.id,
       pageno,
@@ -118,7 +122,9 @@ console.log("Socke_Connection", socket.decoded_token.id);
     if(error){
       return callback(error);
     }
+    console.log('==============================Socke_Userlist======================');
     console.log("Socke_Userlist", socket.decoded_token.id);
+    console.log('==============================Socke_Userlist======================');
     socket.emit("users", FriendListArr);
 
     callback();
@@ -139,7 +145,9 @@ console.log("Socke_Connection", socket.decoded_token.id);
   });
 
   socket.on("join", async (data, callback) => {
+    console.log('==============================Socke_Joinroom======================');
     console.log("Socke_Joinroom", socket.decoded_token.id);
+    console.log('==============================Socke_Joinroom======================');
     const { error, user } = await addUser({
       id: socket.decoded_token.id,
       data,
@@ -167,7 +175,9 @@ console.log("Socke_Connection", socket.decoded_token.id);
   });
 
   socket.on("sendMessage", async (roomid, message, callback) => {
+    console.log('==============================Socke_messagesend======================');
     console.log("Socke_messagesend", socket.decoded_token.id);
+    console.log('==============================Socke_messagesend======================');
     const user = await getUser(socket.decoded_token.id, roomid);
 
     if (!user) {
@@ -227,14 +237,18 @@ console.log("Socke_Connection", socket.decoded_token.id);
   });
 
   socket.on("leave", async (roomid, callback) => {
+    console.log('==============================Socke_leave======================');
     console.log("Socke_leave", socket.decoded_token.id);
+    console.log('==============================Socke_leave======================');
     const user = LeaveRoom(socket.decoded_token.id, roomid);
 
     callback();
   });
 
   socket.on("disconnect", () => {
+    console.log('==============================Socke_dissconnect======================');
     console.log("Socke_dissconnect", socket.decoded_token.id);
+    console.log('==============================Socke_dissconnect======================');
     const user = removeUser(socket.decoded_token.id);
 
     // if(user) {
