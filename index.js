@@ -73,7 +73,7 @@ io.use(
   })
 );
 io.on("connection", async (socket) => {
-  console.log('==============================Socke_Connection======================');
+  console.log('==============================Socke_Connection======================', io);
 console.log("Socke_Connection", socket.decoded_token.id);
 console.log('==============================Socke_Connection======================');
   socket.on("NotificationCount", async ( callback) => {
@@ -245,17 +245,20 @@ console.log('==============================Socke_Connection=====================
     callback();
   });
 
-  socket.on("disconnect", () => {
+  socket.on("disconnect", async (callback) => {
     console.log('==============================Socke_dissconnect======================');
     console.log("Socke_dissconnect", socket.decoded_token.id);
     console.log('==============================Socke_dissconnect======================');
     const user = removeUser(socket.decoded_token.id);
-
+    callback();
     // if(user) {
     //   io.to(user.roomid).emit('message', { user: 'Admin', text: `${user.name} has left.` });
     //   io.to(user.roomid).emit('roomData', { room: user.room, users: getUsersInRoom(user.room)});
     // }
   });
+
+
+
 });
 
 const db = require("./Model");
