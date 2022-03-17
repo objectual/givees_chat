@@ -13,7 +13,7 @@ const countNotificationNumer = async (id) => {
 
 
 const GetNotifications = async (id, pageno, pagesize) => {
-  
+  console.log("Pagesize", pagesize, "pageno", pageno)
     let totalrecords = 0; 
     let pageNumber = pageno;
     let pageCount = pagesize;
