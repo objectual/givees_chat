@@ -21,17 +21,9 @@ const GetNotifications = async (id, pageno, pagesize) => {
     let start = end - pageCount;
     
     
-    let GetSearchChatUserlist = await db.sequelize.query(`SELECT  Notifications.*, sender.userName AS SenderName, imagedata.imageId, imagedata.imageUrl, receiver.userName AS ReceiverNAME, NotificationRoutes.Route  FROM Notifications INNER JOIN users sender ON sender.id = Notifications.senderId INNER JOIN users receiver ON receiver.id = Notifications.receiverId INNER JOIN NotificationRoutes ON NotificationRoutes.RouteId = Notifications.RouteId left JOIN imagedata ON sender.id = imagedata.userId WHERE Notifications.receiverId = 4 ORDER BY Notifications.NotificationId DESC LIMIT ${start}, ${pageCount};`);
+    let GetSearchChatUserlist = await db.sequelize.query(`SELECT Notifications.*, sender.userName AS SenderName, imagedata.imageId, imagedata.imageUrl, receiver.userName AS ReceiverNAME, NotificationRoutes.Route, products.name as ProductName FROM Notifications INNER JOIN users sender ON sender.id = Notifications.senderId INNER JOIN users receiver ON receiver.id = Notifications.receiverId INNER JOIN NotificationRoutes ON NotificationRoutes.RouteId = Notifications.RouteId LEFT JOIN vouchergens ON Notifications.voucherId = vouchergens.id LEFT JOIN products ON vouchergens.productId = products.id left JOIN imagedata ON sender.id = imagedata.userId WHERE Notifications.receiverId = ${id} ORDER BY Notifications.NotificationId DESC LIMIT ${start}, ${pageCount};`);
 
-
-
-
-    //  if(GetSearchChatUserlist){
-      
-     
-    //  }
-
-     let countsearchuser = await db.sequelize.query(`SELECT COUNT(Notifications.NotificationId) as TotalRecords  FROM Notifications INNER JOIN users sender ON sender.id = Notifications.senderId INNER JOIN users receiver ON receiver.id = Notifications.receiverId INNER JOIN NotificationRoutes ON NotificationRoutes.RouteId = Notifications.RouteId left JOIN imagedata ON sender.id = imagedata.userId WHERE Notifications.receiverId = 4`);
+   let countsearchuser = await db.sequelize.query(`SELECT COUNT(Notifications.NotificationId) as TotalRecords  FROM Notifications INNER JOIN users sender ON sender.id = Notifications.senderId INNER JOIN users receiver ON receiver.id = Notifications.receiverId INNER JOIN NotificationRoutes ON NotificationRoutes.RouteId = Notifications.RouteId left JOIN imagedata ON sender.id = imagedata.userId WHERE Notifications.receiverId = ${id}`);
      countsearchuser[0].forEach((x) =>  {
       totalrecords = x.TotalRecords;
     });
@@ -62,8 +54,14 @@ const GetNewNotification = async (id) => {
     let NewNotification = await db.sequelize.query(`SELECT  Notifications.*, sender.userName AS SenderName, imagedata.imageId, imagedata.imageUrl, receiver.userName AS ReceiverNAME, NotificationRoutes.Route  FROM Notifications INNER JOIN users sender ON sender.id = Notifications.senderId INNER JOIN users receiver ON receiver.id = Notifications.receiverId INNER JOIN NotificationRoutes ON NotificationRoutes.RouteId = Notifications.RouteId left JOIN imagedata ON sender.id = imagedata.userId WHERE Notifications.NotificationId = ${id};`);
 
   return { NewNotification };
- } 
+ }
+ 
+const ReadNotifications = (id) => {
+  
+  let ReadNotification = db.sequelize.query(`UPDATE Notifications SET Notifications.IsReed = 1 WHERE Notifications.NotificationId = ${id}`);
+  return { ReadNotification };
+ }
 
 
 
-module.exports = { GetNotifications, UpdateNotifications, GetNewNotification, countNotificationNumer };  
+module.exports = { GetNotifications, UpdateNotifications, GetNewNotification, countNotificationNumer, ReadNotifications };  

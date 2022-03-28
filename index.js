@@ -56,6 +56,7 @@ const {
   UpdateNotifications,
   GetNewNotification,
   countNotificationNumer,
+  ReadNotifications,
 } = require("./SocketIo/notification");
 
 const {
@@ -76,12 +77,25 @@ io.on("connection", async (socket) => {
   console.log('==============================Socke_Connection======================');
 console.log("Socke_Connection", socket.decoded_token.id);
 console.log('==============================Socke_Connection======================');
-  socket.on("NotificationCount", async ( callback) => {
+ 
+socket.on("NotificationCount", async ( callback) => {
     const { notifycount } = await countNotificationNumer(
       socket.decoded_token.id,
     );
 
     socket.emit("CountNotification", notifycount);
+    
+    callback();
+  });
+
+
+  socket.on("NotificationRead", async ( Notificationid,callback) => {
+    
+    const { ReadNotification } = await ReadNotifications(
+      Notificationid,
+    );
+
+    socket.emit("ReadDone", ReadNotification);
     
     callback();
   });
@@ -178,6 +192,8 @@ console.log('==============================Socke_Connection=====================
     console.log('==============================Socke_messagesend======================');
     console.log("Socke_messagesend", socket.decoded_token.id);
     console.log('==============================Socke_messagesend======================');
+   
+   
     const user = await getUser(socket.decoded_token.id, roomid);
 
     if (!user) {
@@ -200,6 +216,7 @@ console.log('==============================Socke_Connection=====================
 
     io.to(user.roomid).emit("message", {
       Messageid: messageid,
+      roomid: user.roomid,
       SenderId: socket.decoded_token.id,
       ReceiverId: user.data,
       Message: message,
@@ -226,13 +243,18 @@ console.log('==============================Socke_Connection=====================
     callback();
   });
 
-  socket.on("DeleteMessage", async ( messageid, callback) => {
+  socket.on("DeleteMessage", async ( messageid, roomid,callback) => {
     console.log("DeleteMessage",messageid)
      UpdateDeleteMessages(
       messageid
     );
 
+     const user = await getUser(socket.decoded_token.id, roomid);
+    // const Available = await getUser(user.data, roomid);
     
+    const { history } = await getChat(roomid);
+    
+    io.to(user.roomid).emit("Reloadmessages", history);
     callback();
   });
 

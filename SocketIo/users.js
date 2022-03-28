@@ -61,7 +61,7 @@ const addChat = async ({senderid,receiverid,roomid,message,Isread}) => {
 const getChat = async (roomid) => {
   
   
- let history = await db.sequelize.query(`SELECT id as Messageid, senderId AS SenderId , receiverId AS ReceiverId , Message, createdAt FROM Chats WHERE Chats.Friendsid = ${roomid} && Chats.SoftDelete = 0 ORDER BY Chats.id DESC`);
+ let history = await db.sequelize.query(`SELECT id as Messageid, Friendsid as roomid, senderId AS SenderId , receiverId AS ReceiverId , Message, createdAt FROM Chats WHERE Chats.Friendsid = ${roomid} && Chats.SoftDelete = 0 ORDER BY Chats.id DESC`);
  
  return { history };
 }
@@ -84,7 +84,7 @@ const ChatFriendlist = async (id, pageno, pagesize) => {
     return { error: ({error: "Chat Option Temporary Unavailable.", Statuscode: 503 }) };
   }
   
-  let GetChatUserlist = await db.sequelize.query(`select Chats.Friendsid, Chats.senderId AS SenderId, Chats.receiverId AS ReceiverId, Chats.Message, Chats.IsReed, Chats.createdAt, sender.userName as Sendername, senderimage.imageId AS SenderImageId, senderimage.imageUrl AS SenderImageurl, receiver.userName AS receiverName, receiverimage.imageId AS ReceiverImageId, receiverimage.imageUrl AS ReceiverImageurl from Chats INNER JOIN friends on friends.id = Chats.Friendsid INNER JOIN users sender ON Chats.senderId = sender.id INNER JOIN users receiver ON Chats.receiverId = receiver.id LEFT JOIN imagedata senderimage ON sender.id = senderimage.userId LEFT JOIN imagedata receiverimage ON receiver.id = receiverimage.userId WHERE Chats.id IN ( SELECT MAX(Chats.id) FROM Chats GROUP BY Chats.Friendsid ) AND (Chats.senderId = ${id} OR Chats.receiverId = ${id}) AND friends.isPending = 0 AND friends.isFriend = 1 ORDER BY Chats.id DESC LIMIT ${start}, ${pageCount};`);
+  let GetChatUserlist = await db.sequelize.query(`select Chats.Friendsid, Chats.senderId AS SenderId, Chats.receiverId AS ReceiverId, Chats.Message, Chats.IsReed, Chats.createdAt, sender.userName as Sendername, senderimage.imageId AS SenderImageId, senderimage.imageUrl AS SenderImageurl, receiver.userName AS receiverName, receiverimage.imageId AS ReceiverImageId, receiverimage.imageUrl AS ReceiverImageurl from Chats INNER JOIN friends on friends.id = Chats.Friendsid INNER JOIN users sender ON Chats.senderId = sender.id INNER JOIN users receiver ON Chats.receiverId = receiver.id LEFT JOIN imagedata senderimage ON sender.id = senderimage.userId LEFT JOIN imagedata receiverimage ON receiver.id = receiverimage.userId WHERE Chats.id IN ( SELECT MAX(Chats.id) FROM Chats WHERE Chats.SoftDelete = 0 GROUP BY Chats.Friendsid ) AND (Chats.senderId = ${id} OR Chats.receiverId = ${id}) AND friends.isPending = 0 AND friends.isFriend = 1 ORDER BY Chats.id DESC LIMIT ${start}, ${pageCount};`);
  
   
           if(GetChatUserlist){
