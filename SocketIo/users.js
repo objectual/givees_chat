@@ -53,7 +53,7 @@ const getUsersInRoom = (roomid) => users.filter((user) => user.roomid === roomid
 const addChat = async ({senderid,receiverid,roomid,message,Isread}) => {
   let messageid = 0;
   
-  let resaddchat = await db.sequelize.query(`INSERT INTO Chats (Chats.Friendsid, Chats.senderId, Chats.receiverId, Chats.Message, Chats.MessageTypeid, Chats.IsReed ) VALUES (${roomid},${senderid},${receiverid},"${message}",${roomid},${Isread})`);
+  let resaddchat = await db.sequelize.query(`INSERT INTO Chats (Chats.Friendsid, Chats.senderId, Chats.receiverId, Chats.Message, Chats.IsReed ) VALUES (${roomid},${senderid},${receiverid},"${message}",${Isread})`);
   messageid = (resaddchat.id)
     return { messageid };
 }
