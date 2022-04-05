@@ -254,7 +254,7 @@ socket.on("NotificationCount", async ( callback) => {
     
     const { history } = await getChat(roomid);
     
-    io.to(user.roomid).emit("Reloadmessages", history);
+    io.to(user.roomid).emit("Reloadmessages", history[0]);
     callback();
   });
 
