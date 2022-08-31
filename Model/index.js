@@ -6,7 +6,7 @@ const dbConfig = require("../config/db.config.js");
 
 
 const Sequelize = require("sequelize");
-const sequelize = new Sequelize("givees_stage", "root", "givees123", {
+const sequelize = new Sequelize("givees_stage", "root", "givees123@2020", {
   host: "34.130.168.220",
   dialect: "mysql",
   operatorsAliases: false,
